@@ -1,0 +1,6 @@
+{
+  "nodeModulesDir": "auto",
+  "imports": {
+    "resend": "npm:resend@3.2.0"
+  }
+}
