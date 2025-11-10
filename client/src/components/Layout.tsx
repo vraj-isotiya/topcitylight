@@ -1,6 +1,5 @@
 import { ReactNode, useEffect, useState } from "react";
 import { useNavigate, Link, useLocation } from "react-router-dom";
-import axiosClient from "@/lib/axiosClient";
 import { Button } from "@/components/ui/button";
 import {
   LayoutDashboard,
@@ -29,6 +28,7 @@ import { useToast } from "@/hooks/use-toast";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useTranslation } from "@/hooks/useTranslation";
 import { useCRMSettings } from "@/hooks/useCRMSettings";
+import axiosClient from "@/lib/axiosClient";
 
 interface LayoutProps {
   children: ReactNode;
@@ -42,8 +42,10 @@ const Layout = ({ children }: LayoutProps) => {
   const { t } = useTranslation();
   const crmSettings = useCRMSettings();
   const [user, setUser] = useState<any>(null);
+  const [userRole, setUserRole] = useState<
+    "admin" | "manager" | "salesperson" | "user" | null
+  >(null);
   const [loading, setLoading] = useState(true);
-  const [userRole, setUserRole] = useState<"admin" | "user" | null>(null);
 
   useEffect(() => {
     const verifyAuth = async () => {
@@ -91,7 +93,7 @@ const Layout = ({ children }: LayoutProps) => {
 
       toast({
         title: t("signOut"),
-        description: t("signedOutDesc"),
+        description: t("signOutSuccess"),
       });
 
       navigate("/auth");

@@ -1,9 +1,13 @@
 import { useEffect, useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
-import { supabase } from "@/integrations/supabase/client";
 import { Loader2 } from "lucide-react";
+import axiosClient from "@/lib/axiosClient";
 
-export const RouteProtection = ({ children }: { children: React.ReactNode }) => {
+export const RouteProtection = ({
+  children,
+}: {
+  children: React.ReactNode;
+}) => {
   const [loading, setLoading] = useState(true);
   const [hasAccess, setHasAccess] = useState(false);
   const navigate = useNavigate();
@@ -14,40 +18,37 @@ export const RouteProtection = ({ children }: { children: React.ReactNode }) => 
   }, [location.pathname]);
 
   const checkAccess = async () => {
-    setLoading(true);
-    
-    const { data: { session } } = await supabase.auth.getSession();
-    
-    if (!session) {
-      navigate("/auth");
-      setLoading(false);
-      return;
-    }
+    try {
+      setLoading(true);
 
-    // Admin-only routes
-    const adminOnlyRoutes = ['/settings'];
-    
-    if (adminOnlyRoutes.includes(location.pathname)) {
-      // Get user role for admin routes
-      const { data: userRoles } = await supabase
-        .from("user_roles")
-        .select("role")
-        .eq("user_id", session.user.id)
-        .single();
+      //  Verify session using backend
+      const res = await axiosClient.get("/users/current-user");
 
-      const isAdmin = userRoles?.role === 'admin';
-      
-      if (!isAdmin) {
+      if (!res.data?.success || !res.data?.data?.user) {
+        throw new Error("Unauthorized");
+      }
+
+      const user = res.data.data.user;
+
+      //  Admin-only routes
+      const adminOnlyRoutes = ["/settings"];
+      const isAdmin = user.role === "admin";
+
+      if (adminOnlyRoutes.includes(location.pathname) && !isAdmin) {
         setHasAccess(false);
         navigate("/");
-        setLoading(false);
         return;
       }
-    }
 
-    // All authenticated users can access non-admin routes
-    setHasAccess(true);
-    setLoading(false);
+      //  Authenticated access granted
+      setHasAccess(true);
+    } catch (error: any) {
+      console.warn("Unauthorized or session expired:", error);
+      setHasAccess(false);
+      navigate("/auth");
+    } finally {
+      setLoading(false);
+    }
   };
 
   if (loading) {

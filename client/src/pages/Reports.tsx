@@ -248,7 +248,7 @@ const Reports = () => {
           <CardHeader>
             <CardTitle>Customer Status Distribution</CardTitle>
           </CardHeader>
-          <CardContent className="flex justify-center items-center">
+          <CardContent>
             <ResponsiveContainer width="100%" height={320}>
               <PieChart>
                 <Pie
@@ -258,9 +258,10 @@ const Reports = () => {
                   innerRadius={60}
                   outerRadius={100}
                   dataKey="count"
-                  label={({ status, percent }) =>
-                    `${status}: ${(percent * 100).toFixed(0)}%`
+                  label={({ percent }) =>
+                    percent > 0.05 ? `${(percent * 100).toFixed(0)}%` : ""
                   }
+                  labelLine={false}
                 >
                   {statusDistribution.map((entry, index) => (
                     <Cell
@@ -269,7 +270,29 @@ const Reports = () => {
                     />
                   ))}
                 </Pie>
-                <Tooltip />
+                <Tooltip
+                  formatter={(value, name, props) => [
+                    value,
+                    props.payload.status,
+                  ]}
+                  contentStyle={{
+                    backgroundColor: "rgba(255, 255, 255, 0.95)",
+                    border: "1px solid #e5e7eb",
+                    borderRadius: "8px",
+                    padding: "8px 12px",
+                  }}
+                />
+                <Legend
+                  verticalAlign="bottom"
+                  height={36}
+                  formatter={(value, entry) => (
+                    <span style={{ color: "#374151", fontSize: "14px" }}>
+                      {entry.payload.status}
+                    </span>
+                  )}
+                  iconType="circle"
+                  iconSize={10}
+                />
               </PieChart>
             </ResponsiveContainer>
           </CardContent>

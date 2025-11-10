@@ -37,33 +37,37 @@ const Dashboard = () => {
         prospects = customers.filter((c) => c.status === "Prospect").length;
       }
 
-      // Fetch email stats from Supabase
-      const startOfMonth = new Date();
-      startOfMonth.setDate(1);
-      startOfMonth.setHours(0, 0, 0, 0);
+      //  Fetch email stats from backend
+      const mailRes = await axiosClient.get("/mail/all");
 
-      const { count: emailsSent } = await supabase
-        .from("emails")
-        .select("*", { count: "exact", head: true })
-        .gte("sent_at", startOfMonth.toISOString());
+      let emailsSent = 0;
+      let repliedThreads = 0;
+      let totalThreads = 0;
 
-      const { count: totalEmails } = await supabase
-        .from("emails")
-        .select("*", { count: "exact", head: true });
+      if (mailRes.data?.success && Array.isArray(mailRes.data.data.threads)) {
+        const threads = mailRes.data.data.threads;
 
-      const { count: repliedEmails } = await supabase
-        .from("email_replies")
-        .select("email_id", { count: "exact", head: true });
+        totalThreads = threads.length;
+        emailsSent = threads.filter(
+          (thread) => thread.status === "sent" || thread.status === "replied"
+        ).length;
 
-      const replyRate = totalEmails
-        ? Math.round((repliedEmails! / totalEmails) * 100)
+        // Threads with replies
+        repliedThreads = threads.filter(
+          (thread) => thread.replies && thread.replies.length > 0
+        ).length;
+      }
+
+      //  Calculate reply rate
+      const replyRate = totalThreads
+        ? Math.round((repliedThreads / totalThreads) * 100)
         : 0;
 
       setStats({
         totalCustomers,
         leads,
         prospects,
-        emailsSent: emailsSent || 0,
+        emailsSent,
         replyRate,
       });
     } catch (error) {
