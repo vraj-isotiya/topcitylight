@@ -165,6 +165,33 @@ VALUES (
          FOR EACH ROW
          EXECUTE PROCEDURE update_timestamp();`;
 
+    const emailsettings = `
+CREATE TABLE IF NOT EXISTS email_provider_settings (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    provider_type VARCHAR NOT NULL,
+    smtp_host VARCHAR,
+    smtp_port INTEGER,
+    smtp_username VARCHAR,
+    smtp_password VARCHAR,
+    imap_host VARCHAR,
+    imap_port INTEGER,
+    imap_username VARCHAR,
+    imap_password VARCHAR,
+    api_key VARCHAR,
+    from_email VARCHAR NOT NULL,
+    from_name VARCHAR,
+    is_active BOOLEAN DEFAULT TRUE,
+    last_uid INTEGER,
+    updated_by UUID REFERENCES users(id) ON DELETE SET NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+`;
+    await pool.query(emailsettings);
+    await pool.query(`CREATE TRIGGER trg_update_email_provider_settings
+BEFORE UPDATE ON email_provider_settings
+FOR EACH ROW
+EXECUTE FUNCTION update_timestamp();`);
     // Execute all table creation queries sequentially
     //await pool.query(userQuery);
     // await pool.query(productsQuery);
@@ -179,6 +206,35 @@ VALUES (
     // await pool.query(update_timestamp);
     //     await pool.query(`ALTER TABLE customers
     // ADD COLUMN contact_person_phone VARCHAR(50);
+    // `);
+    //     await pool.query(`
+    //   CREATE TABLE email_threads (
+    //     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    //     customer_id UUID REFERENCES customers(id) ON DELETE CASCADE,
+    //     subject VARCHAR NOT NULL,
+    //     body TEXT,
+    //     sent_by UUID REFERENCES users(id),
+    //     status VARCHAR,
+    //     message_id VARCHAR UNIQUE,
+    //     sent_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    //     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    //     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    //   );
+    // `);
+
+    //     await pool.query(`
+    //   CREATE TABLE email_replies (
+    //     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    //     thread_id UUID REFERENCES email_threads(id) ON DELETE CASCADE,
+    //     customer_id UUID REFERENCES customers(id),
+    //     reply_body TEXT,
+    //     sender_email VARCHAR,
+    //     message_id VARCHAR UNIQUE,
+    //     in_reply_to VARCHAR,
+    //     received_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    //     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    //     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    //   );
     // `);
 
     //Attach Triggers for updated_at auto-update

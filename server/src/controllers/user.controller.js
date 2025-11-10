@@ -154,7 +154,7 @@ const loginUser = asyncHandler(async (req, res) => {
             refreshToken,
           },
         },
-        "User registered successfully"
+        "User login successfully"
       )
     );
 });
