@@ -102,36 +102,49 @@ export const ProductsManager = () => {
   };
 
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle>Products Management</CardTitle>
+    <Card className="w-full">
+      <CardHeader className="pb-2 sm:pb-4">
+        <CardTitle className="text-lg sm:text-xl font-semibold text-center sm:text-left">
+          Products Management
+        </CardTitle>
       </CardHeader>
-      <CardContent className="space-y-4">
-        <div className="space-y-4 p-4 border rounded-lg bg-muted/50">
-          <div className="space-y-2">
-            <Label htmlFor="product-name">Product Name *</Label>
-            <Input
-              id="product-name"
-              value={formData.name}
-              onChange={(e) =>
-                setFormData({ ...formData, name: e.target.value })
-              }
-              placeholder="Enter product name"
-            />
+
+      <CardContent className="space-y-6">
+        {/* Product Form */}
+        <div className="space-y-4 p-4 sm:p-6 border rounded-lg bg-muted/50">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            {/* Product Name */}
+            <div className="space-y-2 sm:col-span-2">
+              <Label htmlFor="product-name">
+                Product Name <span className="text-destructive">*</span>
+              </Label>
+              <Input
+                id="product-name"
+                value={formData.name}
+                onChange={(e) =>
+                  setFormData({ ...formData, name: e.target.value })
+                }
+                placeholder="Enter product name"
+              />
+            </div>
+
+            {/* Description */}
+            <div className="space-y-2 sm:col-span-2">
+              <Label htmlFor="product-description">Description</Label>
+              <Textarea
+                id="product-description"
+                value={formData.description}
+                onChange={(e) =>
+                  setFormData({ ...formData, description: e.target.value })
+                }
+                placeholder="Enter product description"
+                rows={3}
+              />
+            </div>
           </div>
-          <div className="space-y-2">
-            <Label htmlFor="product-description">Description</Label>
-            <Textarea
-              id="product-description"
-              value={formData.description}
-              onChange={(e) =>
-                setFormData({ ...formData, description: e.target.value })
-              }
-              placeholder="Enter product description"
-              rows={3}
-            />
-          </div>
-          <div className="flex items-center space-x-2">
+
+          {/* Active Switch */}
+          <div className="flex flex-wrap items-center gap-3 sm:gap-2">
             <Switch
               id="product-active"
               checked={formData.is_active}
@@ -141,55 +154,81 @@ export const ProductsManager = () => {
             />
             <Label htmlFor="product-active">Active</Label>
           </div>
-          <div className="flex gap-2">
-            <Button onClick={handleSave}>
+
+          {/* Buttons */}
+          <div className="flex flex-col sm:flex-row gap-2">
+            <Button
+              onClick={handleSave}
+              className="w-full sm:w-auto justify-center"
+            >
               {editingId ? "Update" : "Add"} Product
             </Button>
             {editingId && (
-              <Button variant="outline" onClick={handleCancel}>
+              <Button
+                variant="outline"
+                onClick={handleCancel}
+                className="w-full sm:w-auto justify-center"
+              >
                 Cancel
               </Button>
             )}
           </div>
         </div>
 
-        <div className="space-y-2">
-          <h3 className="font-semibold">Existing Products</h3>
-          <div className="space-y-2 max-h-96 overflow-y-auto">
-            {products.map((product) => (
-              <div
-                key={product.id}
-                className="flex items-center justify-between p-3 border rounded-lg bg-card"
-              >
-                <div className="flex-1">
-                  <p className="font-medium">{product.name}</p>
-                  {product.description && (
-                    <p className="text-sm text-muted-foreground">
-                      {product.description}
+        {/* Product List */}
+        <div className="space-y-3">
+          <h3 className="font-semibold text-base sm:text-lg">
+            Existing Products
+          </h3>
+
+          <div className="space-y-2 max-h-[60vh] overflow-y-auto">
+            {products.length === 0 ? (
+              <p className="text-sm text-muted-foreground text-center py-4">
+                No products found.
+              </p>
+            ) : (
+              products.map((product) => (
+                <div
+                  key={product.id}
+                  className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-3 sm:p-4 border rounded-lg bg-card"
+                >
+                  {/* Product Info */}
+                  <div className="flex-1">
+                    <p className="font-medium text-sm sm:text-base break-words">
+                      {product.name}
                     </p>
-                  )}
-                  <p className="text-xs text-muted-foreground">
-                    Status: {product.is_active ? "Active" : "Inactive"}
-                  </p>
+                    {product.description && (
+                      <p className="text-sm text-muted-foreground break-words">
+                        {product.description}
+                      </p>
+                    )}
+                    <p className="text-xs text-muted-foreground">
+                      Status: {product.is_active ? "Active" : "Inactive"}
+                    </p>
+                  </div>
+
+                  {/* Action Buttons */}
+                  <div className="flex gap-2 justify-end sm:justify-center">
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      onClick={() => handleEdit(product)}
+                      className="w-8 h-8"
+                    >
+                      <Pencil className="h-4 w-4" />
+                    </Button>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      onClick={() => handleDelete(product.id)}
+                      className="w-8 h-8"
+                    >
+                      <Trash2 className="h-4 w-4" />
+                    </Button>
+                  </div>
                 </div>
-                <div className="flex gap-2">
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    onClick={() => handleEdit(product)}
-                  >
-                    <Pencil className="h-4 w-4" />
-                  </Button>
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    onClick={() => handleDelete(product.id)}
-                  >
-                    <Trash2 className="h-4 w-4" />
-                  </Button>
-                </div>
-              </div>
-            ))}
+              ))
+            )}
           </div>
         </div>
       </CardContent>

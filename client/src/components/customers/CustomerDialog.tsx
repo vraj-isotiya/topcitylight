@@ -234,16 +234,19 @@ export const CustomerDialog = ({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-3xl max-h-[90vh]">
+      <DialogContent className="w-[95vw] sm:max-w-2xl md:max-w-3xl max-h-[90vh] p-4 sm:p-6">
         <DialogHeader>
-          <DialogTitle>
+          <DialogTitle className="text-lg sm:text-xl font-semibold">
             {customer ? t("editCustomer") : t("addNewCustomer")}
           </DialogTitle>
         </DialogHeader>
-        <ScrollArea className="max-h-[calc(90vh-120px)] pr-4">
+
+        {/* Scrollable content */}
+        <ScrollArea className="max-h-[calc(90vh-120px)] pr-2 sm:pr-4">
           <form onSubmit={handleSubmit} className="space-y-4">
-            <div className="grid grid-cols-2 gap-4">
-              {/* Basic Info */}
+            {/* Responsive grid */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {/* BASIC INFO */}
               <div className="space-y-2">
                 <Label htmlFor="name">
                   Name <span className="text-destructive">*</span>
@@ -259,6 +262,7 @@ export const CustomerDialog = ({
                   <p className="text-sm text-destructive">{errors.name}</p>
                 )}
               </div>
+
               <div className="space-y-2">
                 <Label htmlFor="email">
                   Email <span className="text-destructive">*</span>
@@ -274,6 +278,7 @@ export const CustomerDialog = ({
                   <p className="text-sm text-destructive">{errors.email}</p>
                 )}
               </div>
+
               <div className="space-y-2">
                 <Label htmlFor="phone">Phone</Label>
                 <Input
@@ -286,6 +291,7 @@ export const CustomerDialog = ({
                   <p className="text-sm text-destructive">{errors.phone}</p>
                 )}
               </div>
+
               <div className="space-y-2">
                 <Label htmlFor="company">Company</Label>
                 <Input
@@ -295,8 +301,8 @@ export const CustomerDialog = ({
                 />
               </div>
 
-              {/* Address Info */}
-              <div className="col-span-2 space-y-2">
+              {/* ADDRESS INFO */}
+              <div className="md:col-span-2 space-y-2">
                 <Label htmlFor="address">Address</Label>
                 <Input
                   id="address"
@@ -304,6 +310,7 @@ export const CustomerDialog = ({
                   onChange={(e) => handleChange("address", e.target.value)}
                 />
               </div>
+
               <div className="space-y-2">
                 <Label htmlFor="country">Country</Label>
                 <Input
@@ -312,6 +319,7 @@ export const CustomerDialog = ({
                   onChange={(e) => handleChange("country", e.target.value)}
                 />
               </div>
+
               <div className="space-y-2">
                 <Label htmlFor="province">Province</Label>
                 <Input
@@ -320,6 +328,7 @@ export const CustomerDialog = ({
                   onChange={(e) => handleChange("province", e.target.value)}
                 />
               </div>
+
               <div className="space-y-2">
                 <Label htmlFor="city">City</Label>
                 <Input
@@ -328,6 +337,7 @@ export const CustomerDialog = ({
                   onChange={(e) => handleChange("city", e.target.value)}
                 />
               </div>
+
               <div className="space-y-2">
                 <Label htmlFor="postal_code">Postal Code</Label>
                 <Input
@@ -337,7 +347,7 @@ export const CustomerDialog = ({
                 />
               </div>
 
-              {/* Bank & Other Info */}
+              {/* BANK INFO */}
               <div className="space-y-2">
                 <Label htmlFor="fax">Fax</Label>
                 <Input
@@ -346,6 +356,7 @@ export const CustomerDialog = ({
                   onChange={(e) => handleChange("fax", e.target.value)}
                 />
               </div>
+
               <div className="space-y-2">
                 <Label htmlFor="bank_name">Bank Name</Label>
                 <Input
@@ -354,6 +365,7 @@ export const CustomerDialog = ({
                   onChange={(e) => handleChange("bank_name", e.target.value)}
                 />
               </div>
+
               <div className="space-y-2">
                 <Label htmlFor="bank_account">Bank Account</Label>
                 <Input
@@ -363,8 +375,8 @@ export const CustomerDialog = ({
                 />
               </div>
 
-              {/* Products - Autocomplete Multi-select */}
-              <div className="col-span-2 space-y-2">
+              {/* PRODUCTS MULTISELECT */}
+              <div className="md:col-span-2 space-y-2">
                 <Label>
                   Products <span className="text-destructive">*</span>
                 </Label>
@@ -424,7 +436,7 @@ export const CustomerDialog = ({
                 </Popover>
               </div>
 
-              {/* Customer Source */}
+              {/* CUSTOMER SOURCE */}
               <div className="space-y-2">
                 <Label htmlFor="customer_source_id">
                   {t("customerSource")}{" "}
@@ -454,7 +466,7 @@ export const CustomerDialog = ({
                 )}
               </div>
 
-              {/* Business Type */}
+              {/* BUSINESS TYPE */}
               <div className="space-y-2">
                 <Label htmlFor="business_type_id">
                   {t("businessType")}{" "}
@@ -484,7 +496,7 @@ export const CustomerDialog = ({
                 )}
               </div>
 
-              {/* Contact Info */}
+              {/* CONTACT INFO */}
               <div className="space-y-2">
                 <Label htmlFor="website">{t("website")}</Label>
                 <Input
@@ -498,6 +510,7 @@ export const CustomerDialog = ({
                   <p className="text-sm text-destructive">{errors.website}</p>
                 )}
               </div>
+
               <div className="space-y-2">
                 <Label htmlFor="contact_person_name">
                   {t("contactPersonName")}
@@ -510,6 +523,7 @@ export const CustomerDialog = ({
                   }
                 />
               </div>
+
               <div className="space-y-2">
                 <Label htmlFor="contact_person_email">
                   {t("contactPersonEmail")}
@@ -531,6 +545,7 @@ export const CustomerDialog = ({
                   </p>
                 )}
               </div>
+
               <div className="space-y-2">
                 <Label htmlFor="contact_person_phone">
                   {t("contactPersonPhone")}
@@ -552,7 +567,7 @@ export const CustomerDialog = ({
                 )}
               </div>
 
-              {/* Status */}
+              {/* STATUS */}
               <div className="space-y-2">
                 <Label htmlFor="status">
                   Status <span className="text-destructive">*</span>
@@ -575,8 +590,8 @@ export const CustomerDialog = ({
                 )}
               </div>
 
-              {/* Notes */}
-              <div className="col-span-2 space-y-2">
+              {/* NOTES */}
+              <div className="md:col-span-2 space-y-2">
                 <Label htmlFor="notes">Notes</Label>
                 <Textarea
                   id="notes"
@@ -587,15 +602,19 @@ export const CustomerDialog = ({
               </div>
             </div>
 
-            <div className="flex justify-end gap-2">
+            {/* ACTION BUTTONS */}
+            <div className="flex flex-col sm:flex-row justify-end gap-2 pt-4">
               <Button
                 type="button"
                 variant="outline"
                 onClick={() => onOpenChange(false)}
+                className="w-full sm:w-auto"
               >
                 Cancel
               </Button>
-              <Button type="submit">Save Customer</Button>
+              <Button type="submit" className="w-full sm:w-auto">
+                Save Customer
+              </Button>
             </div>
           </form>
         </ScrollArea>

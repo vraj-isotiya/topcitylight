@@ -276,26 +276,40 @@ const Customers = () => {
   };
 
   return (
-    <div className="p-6 space-y-6">
-      <div className="flex items-center justify-between">
-        <h1 className="text-3xl font-bold">{t("customers")}</h1>
-        <div className="flex gap-2">
-          <Button variant="outline" onClick={() => setIsImportDialogOpen(true)}>
+    <div className="p-4 sm:p-6 space-y-6">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+        <h1 className="text-2xl sm:text-3xl font-bold">{t("customers")}</h1>
+
+        <div className="flex flex-wrap items-center gap-2 justify-start sm:justify-end  sm:w-auto">
+          <Button
+            variant="outline"
+            onClick={() => setIsImportDialogOpen(true)}
+            className="flex items-center  sm:w-auto justify-start sm:justify-center"
+          >
             <Upload className="w-4 h-4 mr-2" />
-            {t("importCSV")}
+            <span>{t("importCSV")}</span>
           </Button>
-          <Button variant="outline" onClick={handleExport}>
+
+          <Button
+            variant="outline"
+            onClick={handleExport}
+            className="flex items-center  sm:w-auto justify-start sm:justify-center"
+          >
             <Download className="w-4 h-4 mr-2" />
-            {t("export")}
+            <span>{t("export")}</span>
           </Button>
-          <Button onClick={handleAddCustomer}>
+
+          <Button
+            onClick={handleAddCustomer}
+            className="flex items-center  sm:w-auto justify-start sm:justify-center"
+          >
             <Plus className="w-4 h-4 mr-2" />
-            {t("addNewCustomer")}
+            <span>{t("addNewCustomer")}</span>
           </Button>
         </div>
       </div>
 
-      <div className="flex gap-4">
+      <div className="flex flex-col sm:flex-row gap-4 w-full">
         <div className="flex-1">
           <div className="relative">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
@@ -303,7 +317,7 @@ const Customers = () => {
               placeholder={t("searchCustomers")}
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="pl-10"
+              className="pl-10 w-full"
             />
           </div>
         </div>
@@ -326,7 +340,9 @@ const Customers = () => {
             totalItems={filteredCustomers.length}
           />
         </div>
-        <div>
+
+        {/* Desktop sidebar */}
+        <div className="hidden lg:block">
           {selectedCustomer && (
             <CustomerDetails
               customer={selectedCustomer}
@@ -335,6 +351,18 @@ const Customers = () => {
           )}
         </div>
       </div>
+
+      {/* Mobile popup - outside the grid */}
+      {selectedCustomer && (
+        <div className="lg:hidden fixed inset-0 z-50 bg-black/50 flex items-center justify-center p-4">
+          <div className="bg-background w-full max-w-md max-h-[85vh] overflow-auto rounded-lg shadow-lg">
+            <CustomerDetails
+              customer={selectedCustomer}
+              onClose={() => setSelectedCustomer(null)}
+            />
+          </div>
+        </div>
+      )}
 
       <CustomerDialog
         open={isDialogOpen}

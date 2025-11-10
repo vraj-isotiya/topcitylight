@@ -29,6 +29,7 @@ import { useLanguage } from "@/contexts/LanguageContext";
 import { useTranslation } from "@/hooks/useTranslation";
 import { useCRMSettings } from "@/hooks/useCRMSettings";
 import axiosClient from "@/lib/axiosClient";
+import { Menu, X } from "lucide-react";
 
 interface LayoutProps {
   children: ReactNode;
@@ -46,6 +47,7 @@ const Layout = ({ children }: LayoutProps) => {
     "admin" | "manager" | "salesperson" | "user" | null
   >(null);
   const [loading, setLoading] = useState(true);
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
   useEffect(() => {
     const verifyAuth = async () => {
@@ -112,10 +114,14 @@ const Layout = ({ children }: LayoutProps) => {
   ];
 
   return (
-    <div className="flex h-screen bg-background">
+    <div className="flex flex-col md:flex-row min-h-screen bg-background">
       {/* Sidebar */}
-      <aside className="w-64 bg-sidebar border-r border-sidebar-border flex flex-col">
-        <div className="p-4 border-b border-sidebar-border">
+      <aside
+        className={`fixed md:static z-40 inset-y-0 left-0 transform ${
+          isSidebarOpen ? "translate-x-0" : "-translate-x-full"
+        } md:translate-x-0 transition-transform duration-200 ease-in-out w-64 bg-sidebar border-r border-sidebar-border flex flex-col`}
+      >
+        <div className="p-4 border-b border-sidebar-border flex items-center justify-between">
           <div className="flex items-center gap-2">
             {crmSettings?.crm_logo_url ? (
               <img
@@ -134,6 +140,12 @@ const Layout = ({ children }: LayoutProps) => {
               {crmSettings?.crm_name || "CRM"}
             </span>
           </div>
+          <button
+            className="md:hidden text-sidebar-foreground"
+            onClick={() => setIsSidebarOpen(false)}
+          >
+            <X className="w-6 h-6" />
+          </button>
         </div>
 
         <nav className="flex-1 p-4 space-y-1">
@@ -144,6 +156,7 @@ const Layout = ({ children }: LayoutProps) => {
               <Link
                 key={item.path}
                 to={item.path}
+                onClick={() => setIsSidebarOpen(false)}
                 className={`flex items-center gap-3 px-3 py-2 rounded-lg transition-colors ${
                   isActive
                     ? "bg-sidebar-accent text-sidebar-accent-foreground"
@@ -169,86 +182,112 @@ const Layout = ({ children }: LayoutProps) => {
         </div>
       </aside>
 
+      {/* Overlay for mobile */}
+      {isSidebarOpen && (
+        <div
+          className="fixed inset-0 bg-black/50 z-30 md:hidden"
+          onClick={() => setIsSidebarOpen(false)}
+        />
+      )}
+
       {/* Main Content */}
       <div className="flex-1 flex flex-col">
         {/* Header */}
-        <header className="h-16 border-b bg-sidebar flex items-center justify-end px-6">
+        <header className="h-16 border-b bg-sidebar flex items-center justify-between px-6">
           <div className="flex items-center gap-3">
-            {userRole === "admin" && (
-              <>
-                <div className="px-3 py-1 rounded-full bg-primary/10 border border-primary/20">
-                  <span className="text-xs font-semibold text-primary">
-                    {t("admin")}
-                  </span>
-                </div>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  className="text-sidebar-foreground"
-                >
-                  <Upload className="w-4 h-4 mr-2" />
-                  {t("import")}
-                </Button>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  className="text-sidebar-foreground"
-                >
-                  <Download className="w-4 h-4 mr-2" />
-                  {t("export")}
-                </Button>
-                <DropdownMenu>
-                  <DropdownMenuTrigger asChild>
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      className="text-sidebar-foreground"
-                    >
-                      <Languages className="w-4 h-4 mr-2" />
-                      {language === "en" ? t("english") : t("chinese")}
-                    </Button>
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent align="end">
-                    <DropdownMenuLabel>{t("language")}</DropdownMenuLabel>
-                    <DropdownMenuSeparator />
-                    <DropdownMenuItem onClick={() => setLanguage("en")}>
-                      {t("english")}
-                    </DropdownMenuItem>
-                    <DropdownMenuItem onClick={() => setLanguage("zh")}>
-                      {t("chinese")}
-                    </DropdownMenuItem>
-                  </DropdownMenuContent>
-                </DropdownMenu>
-              </>
-            )}
-            <Button
-              variant="ghost"
-              size="icon"
-              className="text-sidebar-foreground"
-              onClick={() => navigate("/")}
-              title={t("home")}
+            <button
+              className="md:hidden text-sidebar-foreground"
+              onClick={() => setIsSidebarOpen(true)}
             >
-              <Home className="w-5 h-5" />
-            </Button>
+              <Menu className="w-6 h-6" />
+            </button>
+            <span className="font-semibold text-sidebar-foreground md:hidden">
+              {crmSettings?.crm_name || "CRM"}
+            </span>
+          </div>
+
+          <div className="flex items-center gap-3">
+            <div className="hidden md:flex items-center gap-3">
+              {userRole === "admin" && (
+                <>
+                  <div className="px-3 py-1 rounded-full bg-primary/10 border border-primary/20">
+                    <span className="text-xs font-semibold text-primary">
+                      {t("admin")}
+                    </span>
+                  </div>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="text-sidebar-foreground"
+                  >
+                    <Upload className="w-4 h-4 mr-2" />
+                    {t("import")}
+                  </Button>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="text-sidebar-foreground"
+                  >
+                    <Download className="w-4 h-4 mr-2" />
+                    {t("export")}
+                  </Button>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="text-sidebar-foreground"
+                    onClick={() => navigate("/")}
+                    title={t("home")}
+                  >
+                    <Home className="w-5 h-5" />
+                  </Button>
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        className="text-sidebar-foreground"
+                        title={t("notifications")}
+                      >
+                        <Bell className="w-5 h-5" />
+                      </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="end" className="w-64">
+                      <DropdownMenuLabel>
+                        {t("notifications")}
+                      </DropdownMenuLabel>
+                      <DropdownMenuSeparator />
+                      <div className="p-4 text-sm text-muted-foreground text-center">
+                        {t("noNotifications")}
+                      </div>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
+                </>
+              )}
+            </div>
+
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button
                   variant="ghost"
-                  size="icon"
+                  size="sm"
                   className="text-sidebar-foreground"
-                  title={t("notifications")}
                 >
-                  <Bell className="w-5 h-5" />
+                  <Languages className="w-4 h-4 mr-2" />
+                  {language === "en" ? t("english") : t("chinese")}
                 </Button>
               </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="w-64">
-                <DropdownMenuLabel>{t("notifications")}</DropdownMenuLabel>
+              <DropdownMenuContent align="end">
+                <DropdownMenuLabel>{t("language")}</DropdownMenuLabel>
                 <DropdownMenuSeparator />
-                <div className="p-4 text-sm text-muted-foreground text-center">
-                  {t("noNotifications")}
-                </div>
+                <DropdownMenuItem onClick={() => setLanguage("en")}>
+                  {t("english")}
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => setLanguage("zh")}>
+                  {t("chinese")}
+                </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
+
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button
@@ -276,7 +315,6 @@ const Layout = ({ children }: LayoutProps) => {
           </div>
         </header>
 
-        {/* Content Area */}
         <main className="flex-1 overflow-auto">{children}</main>
       </div>
     </div>

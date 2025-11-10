@@ -25,66 +25,111 @@ const Settings = () => {
   const [isPasswordDialogOpen, setIsPasswordDialogOpen] = useState(false);
 
   return (
-    <div className="p-6 space-y-6">
-      <div className="flex items-center justify-between">
-        <h1 className="text-3xl font-bold">{t("settings")}</h1>
-        <Button onClick={() => setIsPasswordDialogOpen(true)} variant="outline">
-          <Key className="w-4 h-4 mr-2" />
-          {t("changePassword")}
-        </Button>
+    <div className="px-4 sm:px-6 py-4 sm:py-6 space-y-6 w-full max-w-[1500px] mx-auto">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+        <h1 className="text-2xl sm:text-3xl font-bold text-center sm:text-left">
+          {t("settings")}
+        </h1>
+        <div className="flex justify-center sm:justify-end">
+          <Button
+            onClick={() => setIsPasswordDialogOpen(true)}
+            variant="outline"
+            className="w-full sm:w-auto justify-center"
+          >
+            <Key className="w-4 h-4 mr-2" />
+            <span className="text-sm sm:text-base">{t("changePassword")}</span>
+          </Button>
+        </div>
       </div>
 
       <Tabs defaultValue="crm" className="w-full">
-        <TabsList className="grid w-full grid-cols-7">
-          <TabsTrigger value="crm" className="flex items-center gap-2">
-            <SettingsIcon className="h-4 w-4" />
-            <span className="hidden sm:inline">CRM</span>
-          </TabsTrigger>
-          <TabsTrigger value="email" className="flex items-center gap-2">
-            <Mail className="h-4 w-4" />
-            <span className="hidden sm:inline">{t("emailProvider")}</span>
-          </TabsTrigger>
-          <TabsTrigger value="users" className="flex items-center gap-2">
-            <Users className="h-4 w-4" />
-            <span className="hidden sm:inline">{t("users")}</span>
-          </TabsTrigger>
-          <TabsTrigger value="sources" className="flex items-center gap-2">
-            <Target className="h-4 w-4" />
-            <span className="hidden sm:inline">{t("sources")}</span>
-          </TabsTrigger>
-          <TabsTrigger value="business" className="flex items-center gap-2">
-            <Building2 className="h-4 w-4" />
-            <span className="hidden sm:inline">{t("businessTypes")}</span>
-          </TabsTrigger>
-          <TabsTrigger value="permissions" className="flex items-center gap-2">
-            <Shield className="h-4 w-4" />
-            <span className="hidden sm:inline">{t("permissions")}</span>
-          </TabsTrigger>
-        </TabsList>
+        <div className="flex  w-full">
+          <TabsList
+            className="
+            flex flex-wrap 
+            w-full 
+            gap-1
+            items-start
+            border-b border-border
+            pb-1
+            h-auto
+            justify-start sm:justify-stretch"
+          >
+            <TabsTrigger
+              value="crm"
+              className="justify-center min-w-[100px] sm:flex-1 flex items-center gap-2 text-sm whitespace-nowrap"
+            >
+              <SettingsIcon className="h-4 w-4 flex-shrink-0" />
+              <span>CRM</span>
+            </TabsTrigger>
 
-        <TabsContent value="crm" className="mt-6">
-          <CRMSettingsForm />
-        </TabsContent>
+            <TabsTrigger
+              value="email"
+              className="justify-center min-w-[100px] sm:flex-1 flex items-center gap-2 text-sm whitespace-nowrap"
+            >
+              <Mail className="h-4 w-4 flex-shrink-0" />
+              <span>{t("emailProvider")}</span>
+            </TabsTrigger>
 
-        <TabsContent value="email" className="mt-6">
-          <EmailProviderSettings />
-        </TabsContent>
+            <TabsTrigger
+              value="users"
+              className="justify-center min-w-[100px] sm:flex-1 flex items-center gap-2 text-sm whitespace-nowrap"
+            >
+              <Users className="h-4 w-4 flex-shrink-0" />
+              <span>{t("users")}</span>
+            </TabsTrigger>
 
-        <TabsContent value="users" className="mt-6">
-          <UserRolesManager />
-        </TabsContent>
+            <TabsTrigger
+              value="sources"
+              className="justify-center min-w-[100px] sm:flex-1 flex items-center gap-2 text-sm whitespace-nowrap"
+            >
+              <Target className="h-4 w-4 flex-shrink-0" />
+              <span>{t("sources")}</span>
+            </TabsTrigger>
 
-        <TabsContent value="sources" className="mt-6">
-          <CustomerSourcesManager />
-        </TabsContent>
+            <TabsTrigger
+              value="business"
+              className="justify-center min-w-[100px] sm:flex-1 flex items-center gap-2 text-sm whitespace-nowrap"
+            >
+              <Building2 className="h-4 w-4 flex-shrink-0" />
+              <span>{t("businessTypes")}</span>
+            </TabsTrigger>
 
-        <TabsContent value="business" className="mt-6">
-          <BusinessTypesManager />
-        </TabsContent>
+            <TabsTrigger
+              value="permissions"
+              className="justify-center min-w-[100px] sm:flex-1 flex items-center gap-2 text-sm whitespace-nowrap"
+            >
+              <Shield className="h-4 w-4 flex-shrink-0" />
+              <span>{t("permissions")}</span>
+            </TabsTrigger>
+          </TabsList>
+        </div>
 
-        <TabsContent value="permissions" className="mt-6">
-          <RoutePermissionsManager />
-        </TabsContent>
+        <div className="mt-4 sm:mt-6">
+          <TabsContent value="crm">
+            <CRMSettingsForm />
+          </TabsContent>
+
+          <TabsContent value="email">
+            <EmailProviderSettings />
+          </TabsContent>
+
+          <TabsContent value="users">
+            <UserRolesManager />
+          </TabsContent>
+
+          <TabsContent value="sources">
+            <CustomerSourcesManager />
+          </TabsContent>
+
+          <TabsContent value="business">
+            <BusinessTypesManager />
+          </TabsContent>
+
+          <TabsContent value="permissions">
+            <RoutePermissionsManager />
+          </TabsContent>
+        </div>
       </Tabs>
 
       <ChangePasswordDialog
