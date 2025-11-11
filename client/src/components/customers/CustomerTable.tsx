@@ -11,10 +11,13 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Edit } from "lucide-react";
 
+import { Trash2 } from "lucide-react";
+
 interface CustomerTableProps {
   customers: any[];
   onSelectCustomer: (customer: any) => void;
   onEditCustomer: (customer: any) => void;
+  onDeleteCustomer: (id: string) => void;
   loading: boolean;
 }
 
@@ -22,6 +25,7 @@ export const CustomerTable = ({
   customers,
   onSelectCustomer,
   onEditCustomer,
+  onDeleteCustomer,
   loading,
 }: CustomerTableProps) => {
   if (loading) {
@@ -98,6 +102,14 @@ export const CustomerTable = ({
                     }}
                   >
                     <Edit className="w-4 h-4" />
+                  </Button>
+
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    onClick={() => onDeleteCustomer(customer.id)}
+                  >
+                    <Trash2 className="w-4 h-4 text-destructive" />
                   </Button>
                 </TableCell>
               </TableRow>

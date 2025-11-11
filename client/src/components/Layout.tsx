@@ -43,9 +43,9 @@ const Layout = ({ children }: LayoutProps) => {
   const { t } = useTranslation();
   const crmSettings = useCRMSettings();
   const [user, setUser] = useState<any>(null);
-  const [userRole, setUserRole] = useState<
-    "admin" | "manager" | "salesperson" | "user" | null
-  >(null);
+  const [userRole, setUserRole] = useState<"admin" | "salesperson" | null>(
+    null
+  );
   const [loading, setLoading] = useState(true);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
@@ -110,7 +110,9 @@ const Layout = ({ children }: LayoutProps) => {
     { icon: Mail, label: t("emails"), path: "/emails" },
     { icon: Package, label: t("products"), path: "/products" },
     { icon: FileText, label: t("reports"), path: "/reports" },
-    { icon: Settings, label: t("settings"), path: "/settings" },
+    ...(userRole === "admin"
+      ? [{ icon: Settings, label: t("settings"), path: "/settings" }]
+      : []),
   ];
 
   return (

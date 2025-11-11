@@ -188,6 +188,35 @@ const Customers = () => {
     }
   };
 
+  const handleDeleteCustomer = async (id: string) => {
+    if (!confirm("Are you sure you want to delete this customer?")) return;
+
+    try {
+      const { data } = await axiosClient.delete(`/customers/${id}`);
+      if (data?.success) {
+        toast({
+          title: "Success",
+          description: "Customer deleted successfully",
+        });
+        fetchCustomers();
+        if (selectedCustomer?.id === id) setSelectedCustomer(null);
+      } else {
+        toast({
+          title: "Error",
+          description: data?.message || "Failed to delete customer",
+          variant: "destructive",
+        });
+      }
+    } catch (error) {
+      console.error(error);
+      toast({
+        title: "Error",
+        description: "Error deleting customer",
+        variant: "destructive",
+      });
+    }
+  };
+
   const handleExport = () => {
     if (!customers || customers.length === 0) return;
 
@@ -329,6 +358,7 @@ const Customers = () => {
             customers={paginatedCustomers}
             onSelectCustomer={setSelectedCustomer}
             onEditCustomer={handleEditCustomer}
+            onDeleteCustomer={handleDeleteCustomer}
             loading={loading}
           />
           <PaginationControls

@@ -1,6 +1,5 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -12,6 +11,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { useCRMSettings } from "@/hooks/useCRMSettings";
 import { useToast } from "@/hooks/use-toast";
 import axios from "axios";
 
@@ -25,6 +25,7 @@ const Auth = () => {
   const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const crmSettings = useCRMSettings();
 
   const API_BASE = "/api/v1/users";
 
@@ -143,7 +144,9 @@ const Auth = () => {
     <div className="min-h-screen flex items-center justify-center bg-background p-4">
       <Card className="w-full max-w-md">
         <CardHeader>
-          <CardTitle className="text-2xl font-bold">CRM System</CardTitle>
+          <CardTitle className="text-2xl font-bold">
+            {crmSettings?.crm_name || "CRM System"}
+          </CardTitle>
           <CardDescription>Sign in to manage your customers</CardDescription>
         </CardHeader>
         <CardContent>

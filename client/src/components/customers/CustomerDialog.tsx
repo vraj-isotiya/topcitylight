@@ -203,12 +203,13 @@ export const CustomerDialog = ({
         }
       });
       setErrors(validationErrors);
-
       toast({
-        title: "Validation Error",
-        description: "Please check the form for errors and try again.",
+        title: "Form Validation Failed",
+        description:
+          "Some required fields are missing or contain invalid data. Please review the highlighted fields and try again.",
         variant: "destructive",
       });
+
       return;
     }
 
@@ -280,7 +281,9 @@ export const CustomerDialog = ({
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="phone">Phone</Label>
+                <Label htmlFor="phone">
+                  Phone <span className="text-destructive">*</span>
+                </Label>
                 <Input
                   id="phone"
                   value={formData.phone}
@@ -293,40 +296,60 @@ export const CustomerDialog = ({
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="company">Company</Label>
+                <Label htmlFor="company">
+                  Company <span className="text-destructive">*</span>
+                </Label>
                 <Input
                   id="company"
                   value={formData.company}
                   onChange={(e) => handleChange("company", e.target.value)}
                 />
+                {errors.phone && (
+                  <p className="text-sm text-destructive">{errors.company}</p>
+                )}
               </div>
 
               {/* ADDRESS INFO */}
               <div className="md:col-span-2 space-y-2">
-                <Label htmlFor="address">Address</Label>
+                <Label htmlFor="address">
+                  Address <span className="text-destructive">*</span>
+                </Label>
                 <Input
                   id="address"
                   value={formData.address}
                   onChange={(e) => handleChange("address", e.target.value)}
                 />
+                {errors.phone && (
+                  <p className="text-sm text-destructive">{errors.address}</p>
+                )}
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="country">Country</Label>
+                <Label htmlFor="country">
+                  Country <span className="text-destructive">*</span>
+                </Label>
                 <Input
                   id="country"
                   value={formData.country}
                   onChange={(e) => handleChange("country", e.target.value)}
                 />
+                {errors.phone && (
+                  <p className="text-sm text-destructive">{errors.country}</p>
+                )}
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="province">Province</Label>
+                <Label htmlFor="province">
+                  Province <span className="text-destructive">*</span>
+                </Label>
                 <Input
                   id="province"
                   value={formData.province}
                   onChange={(e) => handleChange("province", e.target.value)}
                 />
+                {errors.phone && (
+                  <p className="text-sm text-destructive">{errors.province}</p>
+                )}
               </div>
 
               <div className="space-y-2">
@@ -336,15 +359,25 @@ export const CustomerDialog = ({
                   value={formData.city}
                   onChange={(e) => handleChange("city", e.target.value)}
                 />
+                {errors.phone && (
+                  <p className="text-sm text-destructive">{errors.city}</p>
+                )}
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="postal_code">Postal Code</Label>
+                <Label htmlFor="postal_code">
+                  Postal Code <span className="text-destructive">*</span>
+                </Label>
                 <Input
                   id="postal_code"
                   value={formData.postal_code}
                   onChange={(e) => handleChange("postal_code", e.target.value)}
                 />
+                {errors.phone && (
+                  <p className="text-sm text-destructive">
+                    {errors.postal_code}
+                  </p>
+                )}
               </div>
 
               {/* BANK INFO */}
@@ -358,21 +391,33 @@ export const CustomerDialog = ({
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="bank_name">Bank Name</Label>
+                <Label htmlFor="bank_name">
+                  Bank Name <span className="text-destructive">*</span>
+                </Label>
                 <Input
                   id="bank_name"
                   value={formData.bank_name}
                   onChange={(e) => handleChange("bank_name", e.target.value)}
                 />
+                {errors.phone && (
+                  <p className="text-sm text-destructive">{errors.bank_name}</p>
+                )}
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="bank_account">Bank Account</Label>
+                <Label htmlFor="bank_account">
+                  Bank Account <span className="text-destructive">*</span>
+                </Label>
                 <Input
                   id="bank_account"
                   value={formData.bank_account}
                   onChange={(e) => handleChange("bank_account", e.target.value)}
                 />
+                {errors.phone && (
+                  <p className="text-sm text-destructive">
+                    {errors.bank_account}
+                  </p>
+                )}
               </div>
 
               {/* PRODUCTS MULTISELECT */}
@@ -498,7 +543,9 @@ export const CustomerDialog = ({
 
               {/* CONTACT INFO */}
               <div className="space-y-2">
-                <Label htmlFor="website">{t("website")}</Label>
+                <Label htmlFor="website">
+                  {t("website")} <span className="text-destructive">*</span>
+                </Label>
                 <Input
                   id="website"
                   value={formData.website}
@@ -513,7 +560,8 @@ export const CustomerDialog = ({
 
               <div className="space-y-2">
                 <Label htmlFor="contact_person_name">
-                  {t("contactPersonName")}
+                  {t("contactPersonName")}{" "}
+                  <span className="text-destructive">*</span>
                 </Label>
                 <Input
                   id="contact_person_name"
@@ -522,11 +570,17 @@ export const CustomerDialog = ({
                     handleChange("contact_person_name", e.target.value)
                   }
                 />
+                {errors.contact_person_email && (
+                  <p className="text-sm text-destructive">
+                    {errors.contact_person_name}
+                  </p>
+                )}
               </div>
 
               <div className="space-y-2">
                 <Label htmlFor="contact_person_email">
-                  {t("contactPersonEmail")}
+                  {t("contactPersonEmail")}{" "}
+                  <span className="text-destructive">*</span>
                 </Label>
                 <Input
                   id="contact_person_email"
@@ -548,7 +602,8 @@ export const CustomerDialog = ({
 
               <div className="space-y-2">
                 <Label htmlFor="contact_person_phone">
-                  {t("contactPersonPhone")}
+                  {t("contactPersonPhone")}{" "}
+                  <span className="text-destructive">*</span>
                 </Label>
                 <Input
                   id="contact_person_phone"

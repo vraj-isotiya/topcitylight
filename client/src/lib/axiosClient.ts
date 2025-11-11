@@ -2,60 +2,31 @@ import axios from "axios";
 
 const axiosClient = axios.create({
   baseURL: "http://localhost:8000/api/v1",
-  withCredentials: true,
+  withCredentials: true, // so your secure cookies (access token) are sent
 });
 
-let isRefreshing = false;
-let refreshSubscribers: (() => void)[] = [];
-
-function onRefreshed() {
-  refreshSubscribers.forEach((callback) => callback());
-  refreshSubscribers = [];
-}
-
-function addRefreshSubscriber(callback: () => void) {
-  refreshSubscribers.push(callback);
-}
-
-// Response Interceptor
+// Simple global error handler
 axiosClient.interceptors.response.use(
   (response) => response,
   async (error) => {
-    const originalRequest = error.config;
+    const status = error.response?.status;
 
-    // Check for 401 Unauthorized
-    if (error.response?.status === 401 && !originalRequest._retry) {
-      if (isRefreshing) {
-        return new Promise((resolve) => {
-          addRefreshSubscriber(() => {
-            resolve(axiosClient(originalRequest));
-          });
-        });
-      }
+    // Handle 401 Unauthorized
+    if (status === 401) {
+      console.warn("Unauthorized request — redirecting to login.");
+      // Redirect to login
+      window.location.href = "/auth";
+      return;
+    }
 
-      originalRequest._retry = true;
-      isRefreshing = true;
+    // Handle 403 Forbidden
+    if (status === 403) {
+      console.warn("Forbidden access — insufficient permissions.");
+    }
 
-      try {
-        // Attempt to refresh the access token
-        await axios.post(
-          "http://localhost:8000/api/v1/users/refresh-token",
-          {},
-          { withCredentials: true }
-        );
-
-        isRefreshing = false;
-        onRefreshed();
-
-        // Retry the failed request (cookies now include new token)
-        return axiosClient(originalRequest);
-      } catch (err) {
-        isRefreshing = false;
-
-        // Refresh failed — redirect to login
-        window.location.href = "/auth";
-        return Promise.reject(err);
-      }
+    // Network or server errors
+    if (!error.response) {
+      console.error("Network error or server unreachable:", error.message);
     }
 
     return Promise.reject(error);

@@ -25,12 +25,66 @@ const AppContent = () => {
     <BrowserRouter>
       <Routes>
         <Route path="/auth" element={<Auth />} />
-        <Route path="/" element={<RouteProtection><Layout><Dashboard /></Layout></RouteProtection>} />
-        <Route path="/customers" element={<RouteProtection><Layout><Customers /></Layout></RouteProtection>} />
-        <Route path="/emails" element={<RouteProtection><Layout><Emails /></Layout></RouteProtection>} />
-        <Route path="/products" element={<RouteProtection><Layout><Products /></Layout></RouteProtection>} />
-        <Route path="/reports" element={<RouteProtection><Layout><Reports /></Layout></RouteProtection>} />
-        <Route path="/settings" element={<RouteProtection><Layout><Settings /></Layout></RouteProtection>} />
+        <Route
+          path="/"
+          element={
+            <RouteProtection>
+              <Layout>
+                <Dashboard />
+              </Layout>
+            </RouteProtection>
+          }
+        />
+        <Route
+          path="/customers"
+          element={
+            <RouteProtection>
+              <Layout>
+                <Customers />
+              </Layout>
+            </RouteProtection>
+          }
+        />
+        <Route
+          path="/emails"
+          element={
+            <RouteProtection>
+              <Layout>
+                <Emails />
+              </Layout>
+            </RouteProtection>
+          }
+        />
+        <Route
+          path="/products"
+          element={
+            <RouteProtection>
+              <Layout>
+                <Products />
+              </Layout>
+            </RouteProtection>
+          }
+        />
+        <Route
+          path="/reports"
+          element={
+            <RouteProtection>
+              <Layout>
+                <Reports />
+              </Layout>
+            </RouteProtection>
+          }
+        />
+        <Route
+          path="/settings"
+          element={
+            <RouteProtection>
+              <Layout>
+                <Settings />
+              </Layout>
+            </RouteProtection>
+          }
+        />
         {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
         <Route path="*" element={<NotFound />} />
       </Routes>

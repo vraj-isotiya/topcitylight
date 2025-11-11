@@ -6,6 +6,7 @@ import { BusinessTypesManager } from "@/components/settings/BusinessTypesManager
 import { EmailProviderSettings } from "@/components/settings/EmailProviderSettings";
 import { RoutePermissionsManager } from "@/components/settings/RoutePermissionsManager";
 import { ChangePasswordDialog } from "@/components/settings/ChangePasswordDialog";
+import { UserPermissionsManager } from "@/components/settings/UserPermissionsManager";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
 import {
@@ -53,11 +54,11 @@ const Settings = () => {
             border-b border-border
             pb-1
             h-auto
-            justify-start sm:justify-stretch"
+            justify-between"
           >
             <TabsTrigger
               value="crm"
-              className="justify-center min-w-[100px] sm:flex-1 flex items-center gap-2 text-sm whitespace-nowrap"
+              className="flex items-center gap-2 text-sm whitespace-nowrap"
             >
               <SettingsIcon className="h-4 w-4 flex-shrink-0" />
               <span>CRM</span>
@@ -65,7 +66,7 @@ const Settings = () => {
 
             <TabsTrigger
               value="email"
-              className="justify-center min-w-[100px] sm:flex-1 flex items-center gap-2 text-sm whitespace-nowrap"
+              className="flex items-center gap-2 text-sm whitespace-nowrap"
             >
               <Mail className="h-4 w-4 flex-shrink-0" />
               <span>{t("emailProvider")}</span>
@@ -73,7 +74,7 @@ const Settings = () => {
 
             <TabsTrigger
               value="users"
-              className="justify-center min-w-[100px] sm:flex-1 flex items-center gap-2 text-sm whitespace-nowrap"
+              className="flex items-center gap-2 text-sm whitespace-nowrap"
             >
               <Users className="h-4 w-4 flex-shrink-0" />
               <span>{t("users")}</span>
@@ -81,7 +82,7 @@ const Settings = () => {
 
             <TabsTrigger
               value="sources"
-              className="justify-center min-w-[100px] sm:flex-1 flex items-center gap-2 text-sm whitespace-nowrap"
+              className="flex items-center gap-2 text-sm whitespace-nowrap"
             >
               <Target className="h-4 w-4 flex-shrink-0" />
               <span>{t("sources")}</span>
@@ -89,7 +90,7 @@ const Settings = () => {
 
             <TabsTrigger
               value="business"
-              className="justify-center min-w-[100px] sm:flex-1 flex items-center gap-2 text-sm whitespace-nowrap"
+              className="flex items-center gap-2 text-sm whitespace-nowrap"
             >
               <Building2 className="h-4 w-4 flex-shrink-0" />
               <span>{t("businessTypes")}</span>
@@ -97,10 +98,17 @@ const Settings = () => {
 
             <TabsTrigger
               value="permissions"
-              className="justify-center min-w-[100px] sm:flex-1 flex items-center gap-2 text-sm whitespace-nowrap"
+              className="flex items-center gap-2 text-sm whitespace-nowrap"
             >
               <Shield className="h-4 w-4 flex-shrink-0" />
               <span>{t("permissions")}</span>
+            </TabsTrigger>
+            <TabsTrigger
+              value="user-permissions"
+              className="flex items-center gap-2 text-sm whitespace-nowrap"
+            >
+              <Shield className="h-4 w-4 " />
+              <span>{t("userPermissionsManagement")}</span>
             </TabsTrigger>
           </TabsList>
         </div>
@@ -128,6 +136,9 @@ const Settings = () => {
 
           <TabsContent value="permissions">
             <RoutePermissionsManager />
+          </TabsContent>
+          <TabsContent value="user-permissions" className="mt-6">
+            <UserPermissionsManager />
           </TabsContent>
         </div>
       </Tabs>

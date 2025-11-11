@@ -35,7 +35,7 @@ export const ChangePasswordDialog = ({
     if (!oldPassword.trim() || !newPassword.trim() || !confirmPassword.trim()) {
       toast({
         title: t("passwordError"),
-        description: t("allFieldsRequired") || "All fields are required",
+        description: "All fields are required",
         variant: "destructive",
       });
       return;
@@ -53,9 +53,7 @@ export const ChangePasswordDialog = ({
     if (newPassword.length < 6) {
       toast({
         title: t("passwordError"),
-        description:
-          t("passwordTooShort") ||
-          "Password must be at least 6 characters long",
+        description: "Password must be at least 6 characters long",
         variant: "destructive",
       });
       return;
@@ -107,9 +105,7 @@ export const ChangePasswordDialog = ({
         <form onSubmit={handleChangePassword} className="space-y-4">
           {/* Old Password */}
           <div className="space-y-2">
-            <Label htmlFor="oldPassword">
-              {t("oldPassword") || "Old Password"}
-            </Label>
+            <Label htmlFor="oldPassword">Old Password</Label>
             <Input
               id="oldPassword"
               type="password"

@@ -18,12 +18,6 @@ const generateAccessToken = (user) => {
   );
 };
 
-const generateRefreshToken = (user) => {
-  return jwt.sign({ id: user.id }, process.env.REFRESH_TOKEN_SECRET, {
-    expiresIn: process.env.REFRESH_TOKEN_EXPIRY,
-  });
-};
-
 const cookieOptions = {
   httpOnly: true,
   secure: true,
@@ -66,17 +60,10 @@ const registerUser = asyncHandler(async (req, res) => {
   const user = rows[0];
 
   const accessToken = generateAccessToken(user);
-  const refreshToken = generateRefreshToken(user);
-
-  await pool.query(`UPDATE users SET refresh_token = $1 WHERE id = $2`, [
-    refreshToken,
-    user.id,
-  ]);
 
   return res
     .status(201)
     .cookie("auth_access_token", accessToken, cookieOptions)
-    .cookie("auth_refresh_token", refreshToken, cookieOptions)
     .json(
       new ApiResponse(
         201,
@@ -84,7 +71,6 @@ const registerUser = asyncHandler(async (req, res) => {
           user,
           tokens: {
             accessToken,
-            refreshToken,
           },
         },
         "User registered successfully"
@@ -104,7 +90,7 @@ const loginUser = asyncHandler(async (req, res) => {
   }
 
   const query = `
-      SELECT id, full_name, email, password,role ,refresh_token,is_active
+      SELECT id, full_name, email, password,role ,is_active
       FROM users
       WHERE email = $1
       LIMIT 1;
@@ -127,12 +113,6 @@ const loginUser = asyncHandler(async (req, res) => {
   }
 
   const accessToken = generateAccessToken(loginuser);
-  const refreshToken = generateRefreshToken(loginuser);
-
-  await pool.query(`UPDATE users SET refresh_token = $1 WHERE id = $2`, [
-    refreshToken,
-    loginuser.id,
-  ]);
 
   const user = {
     id: loginuser.id,
@@ -143,7 +123,6 @@ const loginUser = asyncHandler(async (req, res) => {
   return res
     .status(200)
     .cookie("auth_access_token", accessToken, cookieOptions)
-    .cookie("auth_refresh_token", refreshToken, cookieOptions)
     .json(
       new ApiResponse(
         200,
@@ -151,7 +130,6 @@ const loginUser = asyncHandler(async (req, res) => {
           user,
           tokens: {
             accessToken,
-            refreshToken,
           },
         },
         "User login successfully"
@@ -169,79 +147,10 @@ const logoutUser = asyncHandler(async (req, res) => {
     throw new ApiError(404, "User not found");
   }
 
-  await pool.query(
-    `UPDATE users 
-     SET refresh_token = NULL
-     WHERE id = $1`,
-    [userId]
-  );
-
   return res
     .status(200)
     .clearCookie("auth_access_token")
-    .clearCookie("auth_refresh_token")
     .json(new ApiResponse(200, {}, "User logout"));
-});
-
-const refreshAccessToken = asyncHandler(async (req, res) => {
-  const incomingRefreshToken =
-    req.cookies?.auth_refresh_token || req.body?.auth_refresh_token;
-
-  if (!incomingRefreshToken) {
-    throw new ApiError(401, "Unauthorized request");
-  }
-
-  try {
-    const decoded = jwt.verify(
-      incomingRefreshToken,
-      process.env.REFRESH_TOKEN_SECRET
-    );
-
-    const userId = decoded?.id;
-    if (!userId) {
-      throw new ApiError(401, "Invalid refresh token");
-    }
-
-    const userQuery = `SELECT id, email,role, refresh_token 
-      FROM users 
-      WHERE id = $1
-      LIMIT 1;`;
-    const { rows } = await pool.query(userQuery, [userId]);
-    const user = rows[0];
-
-    if (!user) {
-      throw new ApiError(401, "Invalid refresh token");
-    }
-
-    if (incomingRefreshToken !== user.refresh_token) {
-      throw new ApiError(401, "Refresh token is expired or used");
-    }
-
-    const accessToken = generateAccessToken(user);
-    const newRefreshToken = generateRefreshToken(user);
-
-    const updateQuery = `UPDATE users SET refresh_token = $1 WHERE id = $2`;
-    await pool.query(updateQuery, [newRefreshToken, user.id]);
-
-    const cookieOptions = {
-      httpOnly: true,
-      secure: true,
-    };
-
-    return res
-      .cookie("auth_access_token", accessToken, cookieOptions)
-      .cookie("auth_refresh_token", newRefreshToken, cookieOptions)
-      .status(200)
-      .json(
-        new ApiResponse(
-          200,
-          { accessToken, refreshToken: newRefreshToken },
-          "Access token refreshed"
-        )
-      );
-  } catch (err) {
-    throw new ApiError(401, err.message || "Invalid refresh token");
-  }
 });
 
 const getCurrentUser = asyncHandler(async (req, res) => {
@@ -297,7 +206,6 @@ export {
   registerUser,
   loginUser,
   logoutUser,
-  refreshAccessToken,
   getCurrentUser,
   changeCurrentPassword,
 };
