@@ -53,8 +53,23 @@ const createCustomer = asyncHandler(async (req, res) => {
   notes = trimField(notes);
   status = trimField(status);
 
-  if (!name || !email || !status) {
-    throw new ApiError(400, "Name, email, and status are required");
+  if (
+    !name ||
+    !email ||
+    !status ||
+    !phone ||
+    !company ||
+    !address ||
+    !country ||
+    !province ||
+    !city ||
+    !postal_code ||
+    !bank_name ||
+    !bank_account ||
+    !contact_person_name ||
+    !contact_person_phone
+  ) {
+    throw new ApiError(400, "All feild are required");
   }
 
   if (!validator.isEmail(email)) {
@@ -71,6 +86,15 @@ const createCustomer = asyncHandler(async (req, res) => {
 
   if (business_type_id && !validator.isUUID(business_type_id)) {
     throw new ApiError(400, "Invalid business type ID");
+  }
+
+  const existingCustomerQuery = `
+      SELECT 1 FROM customers WHERE email = $1 ;
+    `;
+  const { rowCount } = await pool.query(existingCustomerQuery, [email]);
+
+  if (rowCount > 0) {
+    throw new ApiError(409, "customers with this email already exists");
   }
 
   const result = await pool.query(
@@ -122,7 +146,6 @@ const createCustomer = asyncHandler(async (req, res) => {
 });
 
 // Get All Customers
-
 const getAllCustomers = asyncHandler(async (req, res) => {
   const { page = 1, limit = 10 } = req.query;
 
@@ -198,7 +221,6 @@ const getAllCustomers = asyncHandler(async (req, res) => {
 });
 
 // Get Customer By ID
-
 const getCustomerById = asyncHandler(async (req, res) => {
   const { id } = req.params;
 
@@ -375,10 +397,41 @@ const deleteCustomer = asyncHandler(async (req, res) => {
     .json(new ApiResponse(200, {}, "Customer deleted successfully"));
 });
 
+const getCustomerStats = asyncHandler(async (req, res) => {
+  const query = `
+    SELECT
+      COUNT(*)::int AS total_customers,
+      COUNT(*) FILTER (WHERE status = 'Lead')::int AS leads,
+      COUNT(*) FILTER (WHERE status = 'Prospect')::int AS prospects
+    FROM customers;
+  `;
+
+  const { rows } = await pool.query(query);
+
+  const stats = rows[0] || {
+    total_customers: 0,
+    leads: 0,
+    prospects: 0,
+  };
+
+  return res.status(200).json(
+    new ApiResponse(
+      200,
+      {
+        totalCustomers: stats.total_customers ?? 0,
+        leads: stats.leads ?? 0,
+        prospects: stats.prospects ?? 0,
+      },
+      "Customer stats retrieved successfully"
+    )
+  );
+});
+
 export {
   createCustomer,
   getAllCustomers,
   getCustomerById,
   updateCustomer,
   deleteCustomer,
+  getCustomerStats,
 };

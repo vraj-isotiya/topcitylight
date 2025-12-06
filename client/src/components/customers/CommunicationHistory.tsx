@@ -149,7 +149,6 @@ export const CommunicationHistory = ({
   //  Threads UI
   return (
     <>
-      {/* New Email Button */}
       <div className="flex justify-end mb-4">
         <Button
           onClick={handleNewEmail}
@@ -161,7 +160,6 @@ export const CommunicationHistory = ({
         </Button>
       </div>
 
-      {/* Thread List */}
       <div className="space-y-3">
         {threads.map((thread) => (
           <Card
@@ -171,7 +169,6 @@ export const CommunicationHistory = ({
               thread.expanded && "shadow-lg border-primary/30"
             )}
           >
-            {/* Thread Header */}
             <div
               className="p-3 sm:p-4 cursor-pointer"
               onClick={() => toggleThread(thread.id)}
@@ -230,10 +227,8 @@ export const CommunicationHistory = ({
               </div>
             </div>
 
-            {/* Expanded Content */}
             {thread.expanded && (
               <div className="border-t overflow-x-auto">
-                {/* Original Email */}
                 <div className="p-3 sm:p-4 bg-muted/30">
                   <div className="flex flex-col sm:flex-row gap-3">
                     <div className="flex items-center justify-center w-8 h-8 rounded-full bg-primary/10 flex-shrink-0">
@@ -258,7 +253,6 @@ export const CommunicationHistory = ({
                   </div>
                 </div>
 
-                {/* Replies */}
                 {thread.replies.map((reply, i) => {
                   const isAdminReply = reply.sender_email?.includes(
                     "developer.vraj@gmail.com"
@@ -322,14 +316,15 @@ export const CommunicationHistory = ({
         ))}
       </div>
 
-      {/* Reply Dialog */}
-      <ComposeReplyDialog
-        open={replyDialogOpen}
-        onOpenChange={setReplyDialogOpen}
-        customer={customer}
-        originalEmail={selectedEmail}
-        onEmailSent={fetchCommunications}
-      />
+      {replyDialogOpen && (
+        <ComposeReplyDialog
+          open={replyDialogOpen}
+          onOpenChange={setReplyDialogOpen}
+          customer={customer}
+          originalEmail={selectedEmail}
+          onEmailSent={fetchCommunications}
+        />
+      )}
     </>
   );
 };

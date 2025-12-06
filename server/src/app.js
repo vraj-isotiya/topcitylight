@@ -15,10 +15,11 @@ app.use(
     credentials: true,
   })
 );
-//console.log(await fetchIncomingEmails());
+
 app.use(express.json({ limit: "16kb" }));
 app.use(express.urlencoded({ extended: true, limit: "16kb" }));
 app.use(cookieParser());
+//console.log(await fetchIncomingEmails());
 //fetchIncomingEmails();
 
 //routes import
@@ -32,6 +33,7 @@ import customersRouter from "./routes/customers.routes.js";
 import customerProductsRouter from "./routes/customer_products.routes.js";
 import mailRouter from "./routes/mail.routes.js";
 import mailSettingsRouter from "./routes/mail_settings.routes.js";
+import reportRouter from "./routes/report.routes.js";
 
 app.use("/api/v1/users", userRouter);
 app.use("/api/v1/products", productRouter);
@@ -43,6 +45,7 @@ app.use("/api/v1/customers", customersRouter);
 app.use("/api/v1/customer-products", customerProductsRouter);
 app.use("/api/v1/mail", mailRouter);
 app.use("/api/v1/mail-settings", mailSettingsRouter);
+app.use("/api/v1/reports", reportRouter);
 
 app.use(errorHandler);
 export { app };

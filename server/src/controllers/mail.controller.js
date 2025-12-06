@@ -5,6 +5,7 @@ import { asyncHandler } from "../utils/asyncHandler.js";
 import { ApiError } from "../utils/ApiError.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
 import { paginateQuery } from "../utils/pagination.js";
+import { fetchIncomingEmails } from "../utils/imapFetcher.js";
 
 // SEND EMAIL (Creates new thread)
 const sendEmail = asyncHandler(async (req, res) => {
@@ -374,4 +375,80 @@ const getAllEmails = asyncHandler(async (req, res) => {
   );
 });
 
-export { sendEmail, replyToEmail, getEmailThreads, getAllEmails };
+const getEmailStats = asyncHandler(async (req, res) => {
+  const query = `
+    WITH threads AS (
+      SELECT
+        et.id,
+        et.status,
+        et.sent_at,
+        COUNT(er.id) AS reply_count
+      FROM email_threads et
+      LEFT JOIN email_replies er ON er.thread_id = et.id
+      GROUP BY et.id
+    )
+    SELECT
+      COUNT(*)::int AS total_threads,
+      COUNT(*) FILTER (WHERE status IN ('sent', 'replied'))::int AS emails_sent_all_time,
+      COUNT(*) FILTER (
+        WHERE status IN ('sent', 'replied')
+          AND sent_at >= date_trunc('month', now())
+      )::int AS emails_sent_this_month,
+      COUNT(*) FILTER (WHERE reply_count > 0)::int AS replied_threads
+    FROM threads;
+  `;
+
+  const { rows } = await pool.query(query);
+
+  const stats = rows[0] || {
+    total_threads: 0,
+    emails_sent_all_time: 0,
+    emails_sent_this_month: 0,
+    replied_threads: 0,
+  };
+
+  const totalThreads = stats.total_threads ?? 0;
+  const repliedThreads = stats.replied_threads ?? 0;
+  const replyRate = totalThreads
+    ? Math.round((repliedThreads / totalThreads) * 100)
+    : 0;
+
+  return res.status(200).json(
+    new ApiResponse(
+      200,
+      {
+        totalThreads,
+        emailsSentAllTime: stats.emails_sent_all_time ?? 0,
+        emailsSentThisMonth: stats.emails_sent_this_month ?? 0,
+        repliedThreads,
+        replyRate,
+      },
+      "Email stats retrieved successfully"
+    )
+  );
+});
+
+const triggerEmailSync = asyncHandler(async (req, res) => {
+  const result = await fetchIncomingEmails();
+
+  if (!result.success) {
+    return res
+      .status(400)
+      .json(new ApiResponse(400, { code: result.code }, result.message));
+  }
+
+  return res
+    .status(200)
+    .json(
+      new ApiResponse(200, { processed: result.processed }, result.message)
+    );
+});
+
+export {
+  sendEmail,
+  replyToEmail,
+  getEmailThreads,
+  getAllEmails,
+  getEmailStats,
+  triggerEmailSync,
+};

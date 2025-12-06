@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
   Dialog,
   DialogContent,
@@ -30,12 +30,17 @@ export const ComposeReplyDialog = ({
   onEmailSent,
 }: ComposeReplyDialogProps) => {
   const { toast } = useToast();
-  const [subject, setSubject] = useState(
-    originalEmail ? `Re: ${originalEmail.subject}` : ""
-  );
+  const [subject, setSubject] = useState("");
   const [body, setBody] = useState("");
   const [sending, setSending] = useState(false);
-
+  useEffect(() => {
+    if (originalEmail) {
+      setSubject(`Re: ${originalEmail.subject}`);
+    } else {
+      setSubject("");
+    }
+  }, [originalEmail]);
+  console.log(subject);
   const handleSend = async () => {
     if (!customer?.email) {
       toast({
@@ -125,16 +130,17 @@ export const ComposeReplyDialog = ({
                   className="bg-muted"
                 />
               </div>
-              <div>
-                <Label>Subject</Label>
-                <Input
-                  value={subject}
-                  onChange={(e) => setSubject(e.target.value)}
-                  placeholder="Email subject"
-                />
-              </div>
             </>
           )}
+          <div>
+            <Label>Subject</Label>
+            <Input
+              value={subject}
+              onChange={(e) => setSubject(e.target.value)}
+              placeholder="Email subject"
+              disabled={!!originalEmail}
+            />
+          </div>
           <div>
             <Label>Message</Label>
             <Textarea

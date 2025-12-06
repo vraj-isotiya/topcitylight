@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { supabase } from "@/integrations/supabase/client";
+import axiosClient from "@/lib/axiosClient";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
   LineChart,
@@ -32,94 +32,36 @@ const Reports = () => {
   const fetchReportData = async () => {
     setLoading(true);
 
-    // Customer growth over last 6 months
-    const monthsAgo = new Date();
-    monthsAgo.setMonth(monthsAgo.getMonth() - 6);
-
-    const { data: customers } = await supabase
-      .from("customers")
-      .select("created_at")
-      .gte("created_at", monthsAgo.toISOString())
-      .order("created_at", { ascending: true });
-
-    // Group by month
-    const growthByMonth: { [key: string]: number } = {};
-    customers?.forEach((customer) => {
-      const month = new Date(customer.created_at).toLocaleDateString("en-US", {
-        month: "short",
-        year: "numeric",
+    try {
+      // ask backend to aggregate last 6 months
+      const res = await axiosClient.get("/reports/stats", {
+        params: { months: 6 }, // optional: backend defaults to 6 anyway
       });
-      growthByMonth[month] = (growthByMonth[month] || 0) + 1;
-    });
 
-    setCustomerGrowth(
-      Object.entries(growthByMonth).map(([month, count]) => ({
-        month,
-        customers: count,
-      }))
-    );
-
-    // Email activity by month
-    const { data: emails } = await supabase
-      .from("emails")
-      .select("sent_at")
-      .gte("sent_at", monthsAgo.toISOString())
-      .order("sent_at", { ascending: true });
-
-    const emailsByMonth: { [key: string]: number } = {};
-    emails?.forEach((email) => {
-      const month = new Date(email.sent_at).toLocaleDateString("en-US", {
-        month: "short",
-        year: "numeric",
-      });
-      emailsByMonth[month] = (emailsByMonth[month] || 0) + 1;
-    });
-
-    setEmailActivity(
-      Object.entries(emailsByMonth).map(([month, count]) => ({
-        month,
-        emails: count,
-      }))
-    );
-
-    // Status distribution
-    const { data: allCustomers } = await supabase
-      .from("customers")
-      .select("status");
-
-    const statusCount: { [key: string]: number } = {};
-    allCustomers?.forEach((customer) => {
-      const status = customer.status || "Unknown";
-      statusCount[status] = (statusCount[status] || 0) + 1;
-    });
-
-    setStatusDistribution(
-      Object.entries(statusCount).map(([status, count]) => ({ status, count }))
-    );
-
-    // Top customers by email communication
-    const { data: emailCounts } = await supabase
-      .from("emails")
-      .select("customer_id, customers(name)");
-
-    const customerEmailCount: {
-      [key: string]: { name: string; count: number };
-    } = {};
-    emailCounts?.forEach((email: any) => {
-      const customerId = email.customer_id;
-      const customerName = email.customers?.name || "Unknown";
-      if (!customerEmailCount[customerId]) {
-        customerEmailCount[customerId] = { name: customerName, count: 0 };
+      if (!res.data?.success || !res.data.data) {
+        console.error("Invalid report response", res.data);
+        return;
       }
-      customerEmailCount[customerId].count += 1;
-    });
 
-    const sortedCustomers = Object.values(customerEmailCount)
-      .sort((a, b) => b.count - a.count)
-      .slice(0, 5);
+      const {
+        customerGrowth,
+        emailActivity,
+        statusDistribution,
+        topCustomers,
+      } = res.data.data;
 
-    setTopCustomers(sortedCustomers);
-    setLoading(false);
+      setCustomerGrowth(customerGrowth || []);
+
+      setEmailActivity(emailActivity || []);
+
+      setStatusDistribution(statusDistribution || []);
+
+      setTopCustomers(topCustomers || []);
+    } catch (error) {
+      console.error("Error fetching report data:", error);
+    } finally {
+      setLoading(false);
+    }
   };
 
   const COLORS = [
@@ -144,7 +86,6 @@ const Reports = () => {
     <div className="p-6 space-y-6">
       <h1 className="text-3xl font-bold">Reports & Analytics</h1>
 
-      {/* Summary Cards */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
         <Card>
           <CardHeader className="flex flex-row items-center justify-between pb-2">
@@ -198,7 +139,6 @@ const Reports = () => {
         </Card>
       </div>
 
-      {/* Charts Row 1 */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <Card>
           <CardHeader>
@@ -242,7 +182,6 @@ const Reports = () => {
         </Card>
       </div>
 
-      {/* Charts Row 2 */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <Card>
           <CardHeader>

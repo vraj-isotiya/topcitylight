@@ -1,5 +1,4 @@
 import { useEffect, useState } from "react";
-import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Users, Mail, TrendingUp } from "lucide-react";
 import axiosClient from "@/lib/axiosClient";
@@ -22,46 +21,29 @@ const Dashboard = () => {
   const fetchStats = async () => {
     setLoading(true);
     try {
-      // Fetch all customers from backend
-      const res = await axiosClient.get("/customers/all");
+      const [customersRes, mailRes] = await Promise.all([
+        axiosClient.get("/customers/dashboard/stats"),
+        axiosClient.get("/mail/stats"),
+      ]);
 
       let totalCustomers = 0;
       let leads = 0;
       let prospects = 0;
-
-      if (res.data?.success && Array.isArray(res.data.data.customers)) {
-        const customers = res.data.data.customers;
-
-        totalCustomers = customers.length;
-        leads = customers.filter((c) => c.status === "Lead").length;
-        prospects = customers.filter((c) => c.status === "Prospect").length;
-      }
-
-      //  Fetch email stats from backend
-      const mailRes = await axiosClient.get("/mail/all");
-
       let emailsSent = 0;
-      let repliedThreads = 0;
-      let totalThreads = 0;
+      let replyRate = 0;
 
-      if (mailRes.data?.success && Array.isArray(mailRes.data.data.threads)) {
-        const threads = mailRes.data.data.threads;
-
-        totalThreads = threads.length;
-        emailsSent = threads.filter(
-          (thread) => thread.status === "sent" || thread.status === "replied"
-        ).length;
-
-        // Threads with replies
-        repliedThreads = threads.filter(
-          (thread) => thread.replies && thread.replies.length > 0
-        ).length;
+      if (customersRes.data?.success && customersRes.data.data) {
+        const c = customersRes.data.data;
+        totalCustomers = c.totalCustomers ?? 0;
+        leads = c.leads ?? 0;
+        prospects = c.prospects ?? 0;
       }
 
-      //  Calculate reply rate
-      const replyRate = totalThreads
-        ? Math.round((repliedThreads / totalThreads) * 100)
-        : 0;
+      if (mailRes.data?.success && mailRes.data.data) {
+        const m = mailRes.data.data;
+        emailsSent = m.emailsSentThisMonth ?? 0;
+        replyRate = m.replyRate ?? 0;
+      }
 
       setStats({
         totalCustomers,

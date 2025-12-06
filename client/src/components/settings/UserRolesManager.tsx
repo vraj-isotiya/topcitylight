@@ -251,9 +251,8 @@ export const UserRolesManager = () => {
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="user">User</SelectItem>
+                    <SelectItem value="user">{t("admin")}</SelectItem>
                     <SelectItem value="salesperson">Salesperson</SelectItem>
-                    <SelectItem value="manager">Manager</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
